@@ -15,6 +15,7 @@ export interface VocalIsolationResult {
 
 import path from 'path';
 import {promises as fsPromises} from 'fs';
+import {access} from 'fs/promises'; // Import access
 
 /**
  * Asynchronously isolates the vocal track from a song using Demucs.
@@ -43,6 +44,14 @@ export async function isolateVocals(song: string): Promise<VocalIsolationResult>
       } catch (error: any) {
           console.error('Failed to write input file:', error);
           return reject(new Error(`Failed to write input file: ${error.message}`));
+      }
+
+      // Check if Demucs executable exists
+      try {
+        await access(demucsCommand);
+      } catch (error) {
+        console.error('Demucs executable not found:', error);
+        return reject(new Error('Demucs executable not found. Please ensure Demucs is installed and available at /app/demucs.'));
       }
 
       const demucsProcess = spawn(demucsCommand, demucsArgs);
@@ -101,7 +110,7 @@ export async function isolateVocals(song: string): Promise<VocalIsolationResult>
       demucsProcess.on('error', (err:Error) => {
 		console.error('Failed to start Demucs process.', err.message);
 		if ((err as any).code === 'ENOENT') {
-		  reject(new Error('Demucs executable not found. Please ensure Demucs is installed and available in your system PATH.'));
+		  reject(new Error('Demucs executable not found. Please ensure Demucs is installed and available at /app/demucs.'));
 		} else {
 		  reject(err);
 		}
