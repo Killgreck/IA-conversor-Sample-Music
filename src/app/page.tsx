@@ -64,6 +64,15 @@ export default function Home() {
       // Merge the converted vocal track with the instrumental track
       const mergedAudio = await mergeAudio(convertedVocalTrack, instrumentalTrack);
 
+      // Convert the merged audio (Buffer) to a Blob
+      const blob = new Blob([mergedAudio], {type: 'audio/mpeg'});
+
+      // Create a URL for the Blob
+      const newSongUrl = URL.createObjectURL(blob);
+
+      // Store the URL in local storage
+      localStorage.setItem('newSongUrl', newSongUrl);
+
       toast({
         title: 'Success',
         description: 'Voice morphing completed!',
