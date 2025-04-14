@@ -1,3 +1,5 @@
+'use client';
+
 import type {Metadata} from 'next';
 import {Geist, Geist_Mono} from 'next/font/google';
 import './globals.css';
@@ -18,7 +20,7 @@ export const metadata: Metadata = {
   description: 'Change voices in a song using your own voice.',
 };
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
@@ -33,6 +35,7 @@ export default async function RootLayout({
 }
 
 // Client component wrapper to handle side effects
+
 import {useEffect} from 'react';
 
 function ClientRootLayout({ children }: { children: React.ReactNode }) {
