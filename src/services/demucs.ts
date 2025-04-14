@@ -34,7 +34,8 @@ export async function isolateVocals(song: string): Promise<VocalIsolationResult>
       // Create a temporary input file
       const inputFilePath = path.join(process.cwd(), 'input.wav');
 	  const outputDir = path.join(process.cwd(), 'separated');
-      const demucsCommand = 'demucs';
+	  // Use a hardcoded path to demucs executable
+      const demucsCommand = '/app/demucs';
       const demucsArgs = [inputFilePath, '-o', outputDir];
 
 	  try {
