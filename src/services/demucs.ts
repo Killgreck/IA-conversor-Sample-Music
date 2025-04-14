@@ -4,42 +4,41 @@
  */
 export interface VocalIsolationResult {
   /**
-   * The isolated vocal track as a Buffer.
+   * The isolated vocal track as a base64 encoded string.
    */
-  vocalTrack: Buffer;
+  vocalTrack: string;
   /**
-   * The instrumental track as a Buffer.
+   * The instrumental track as a base64 encoded string.
    */
-  instrumentalTrack: Buffer;
+  instrumentalTrack: string;
 }
 
 import path from 'path';
-import {VocalIsolationResult} from "@/services/audio-merger";
 import {promises as fsPromises} from 'fs';
 
 /**
  * Asynchronously isolates the vocal track from a song using Demucs.
  *
- * @param song The song (any format) as a Buffer.
+ * @param song The song (any format) as a base64 encoded string.
  * @returns A promise that resolves to a VocalIsolationResult object containing the vocal and instrumental tracks.
  */
-export async function isolateVocals(song: Buffer): Promise<VocalIsolationResult> {
+export async function isolateVocals(song: string): Promise<VocalIsolationResult> {
   return new Promise(async (resolve, reject) => {
     if (typeof window === 'undefined') {
-      // Import 'child_process' only on the server side
       const {spawn} = require('child_process');
       const fs = require('fs');
 
+      // Convert base64 song to buffer
+      const songBuffer = Buffer.from(song, 'base64');
+
       // Create a temporary input file
       const inputFilePath = path.join(process.cwd(), 'input.wav');
-
-      // Output directory for Demucs
-      const outputDir = path.join(process.cwd(), 'separated');
+	  const outputDir = path.join(process.cwd(), 'separated');
       const demucsCommand = 'demucs';
       const demucsArgs = [inputFilePath, '-o', outputDir];
 
 	  try {
-        await fsPromises.writeFile(inputFilePath, song);
+        await fsPromises.writeFile(inputFilePath, songBuffer);
       } catch (error: any) {
           console.error('Failed to write input file:', error);
           return reject(new Error(`Failed to write input file: ${error.message}`));
@@ -55,19 +54,19 @@ export async function isolateVocals(song: Buffer): Promise<VocalIsolationResult>
 
       demucsProcess.on('close', async (code) => {
         if (code === 0) {
-          // Construct the paths to the vocal and instrumental tracks
           const songName = path.basename(inputFilePath, path.extname(inputFilePath));
           const vocalsPath = path.join(outputDir, 'htdemucs', songName, 'vocals.wav');
           const accompanimentPath = path.join(outputDir, 'htdemucs', songName, 'accompaniment.wav');
 
-          // Read the vocal and instrumental tracks
           try {
-            const vocalTrack = fs.readFileSync(vocalsPath);
-            const instrumentalTrack = fs.readFileSync(accompanimentPath);
+            const vocalTrackBuffer = fs.readFileSync(vocalsPath);
+            const instrumentalTrackBuffer = fs.readFileSync(accompanimentPath);
 
-            // Clean up temporary files and directories
+            // Convert buffers to base64 strings
+            const vocalTrack = vocalTrackBuffer.toString('base64');
+            const instrumentalTrack = instrumentalTrackBuffer.toString('base64');
+
             await fsPromises.unlink(inputFilePath);
-            // Function to delete directory recursively
             async function deleteFolderRecursive(folderPath: string) {
               if (fs.existsSync(folderPath)) {
                 fs.readdirSync(folderPath).forEach(async (file) => {
