@@ -60,12 +60,14 @@ export default function Home() {
 
       // Train voice model
       setProgress('Training voice model');
-      const {modelId} = await trainVoiceModel({voiceTrack: voiceTrack});
+      const voiceTrackBase64 = voiceTrack.toString('base64');
+      const {modelId} = await trainVoiceModel({voiceTrack: voiceTrackBase64});
 
       // Perform voice conversion
       setProgress('Performing voice conversion');
+       const vocalTrackBase64ForConversion = vocalTrack.toString('base64');
       const {convertedVocalTrack} = await voiceConversion({
-        vocalTrack: vocalTrack,
+        vocalTrack: vocalTrackBase64ForConversion,
         voiceModelId: modelId,
       });
 

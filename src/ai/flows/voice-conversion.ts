@@ -11,7 +11,7 @@ import {ai} from '@/ai/ai-instance';
 import {z} from 'genkit';
 
 const VoiceConversionInputSchema = z.object({
-  vocalTrack: z.instanceof(Buffer).describe('The isolated vocal track as a binary audio file.'),
+  vocalTrack: z.string().describe('The isolated vocal track as a base64 encoded string.'),
   voiceModelId: z.string().describe('The ID of the trained voice model.'),
 });
 export type VoiceConversionInput = z.infer<typeof VoiceConversionInputSchema>;
@@ -22,7 +22,9 @@ const VoiceConversionOutputSchema = z.object({
 export type VoiceConversionOutput = z.infer<typeof VoiceConversionOutputSchema>;
 
 export async function voiceConversion(input: VoiceConversionInput): Promise<VoiceConversionOutput> {
-  return voiceConversionFlow(input);
+   // Convert the base64 encoded string back to a Buffer
+  const vocalTrackBuffer = Buffer.from(input.vocalTrack, 'base64');
+  return voiceConversionFlow({vocalTrack: vocalTrackBuffer, voiceModelId: input.voiceModelId});
 }
 
 const convertVoice = ai.defineTool({
@@ -47,11 +49,14 @@ const prompt = ai.definePrompt({
 });
 
 const voiceConversionFlow = ai.defineFlow<
-  typeof VoiceConversionInputSchema,
+  {vocalTrack: Buffer, voiceModelId: string},
   typeof VoiceConversionOutputSchema
 >({
   name: 'voiceConversionFlow',
-  inputSchema: VoiceConversionInputSchema,
+  inputSchema: z.object({
+    vocalTrack: z.instanceof(Buffer).describe('The isolated vocal track as a binary audio file.'),
+    voiceModelId: z.string().describe('The ID of the trained voice model.'),
+  }),
   outputSchema: VoiceConversionOutputSchema,
 }, async input => {
   const convertedVocalTrack = await convertVoice(input);
@@ -59,4 +64,3 @@ const voiceConversionFlow = ai.defineFlow<
     convertedVocalTrack: convertedVocalTrack,
   };
 });
-

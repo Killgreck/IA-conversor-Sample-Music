@@ -11,7 +11,7 @@ import {ai} from '@/ai/ai-instance';
 import {z} from 'genkit';
 
 const TrainVoiceModelInputSchema = z.object({
-  voiceTrack: z.instanceof(Buffer).describe('The m4a voice track to train the voice model.'),
+  voiceTrack: z.string().describe('The m4a voice track to train the voice model, as a base64 encoded string.'),
 });
 export type TrainVoiceModelInput = z.infer<typeof TrainVoiceModelInputSchema>;
 
@@ -21,16 +21,20 @@ const TrainVoiceModelOutputSchema = z.object({
 export type TrainVoiceModelOutput = z.infer<typeof TrainVoiceModelOutputSchema>;
 
 export async function trainVoiceModel(input: TrainVoiceModelInput): Promise<TrainVoiceModelOutput> {
-  return trainVoiceModelFlow(input);
+  // Convert the base64 encoded string back to a Buffer
+  const voiceTrackBuffer = Buffer.from(input.voiceTrack, 'base64');
+  return trainVoiceModelFlow({voiceTrack: voiceTrackBuffer});
 }
 
 const trainVoiceModelFlow = ai.defineFlow<
-  typeof TrainVoiceModelInputSchema,
+  {voiceTrack: Buffer},
   typeof TrainVoiceModelOutputSchema
 >(
   {
     name: 'trainVoiceModelFlow',
-    inputSchema: TrainVoiceModelInputSchema,
+    inputSchema: z.object({
+      voiceTrack: z.instanceof(Buffer).describe('The m4a voice track to train the voice model.'),
+    }),
     outputSchema: TrainVoiceModelOutputSchema,
   },
   async input => {
@@ -46,4 +50,3 @@ const trainVoiceModelFlow = ai.defineFlow<
     };
   }
 );
-
