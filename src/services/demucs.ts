@@ -19,10 +19,10 @@ import {VocalIsolationResult} from "@/services/audio-merger";
 /**
  * Asynchronously isolates the vocal track from a song using Demucs.
  *
- * @param song The song (any format) as a Buffer.
+ * @param song The song (any format) as a base64 string.
  * @returns A promise that resolves to a VocalIsolationResult object containing the vocal and instrumental tracks.
  */
-export async function isolateVocals(song: Buffer): Promise<VocalIsolationResult> {
+export async function isolateVocals(song: string): Promise<VocalIsolationResult> {
   return new Promise((resolve, reject) => {
     if (typeof window === 'undefined') {
       // Import 'child_process' only on the server side
@@ -31,7 +31,8 @@ export async function isolateVocals(song: Buffer): Promise<VocalIsolationResult>
 
       // Create a temporary input file
       const inputFilePath = path.join(process.cwd(), 'input.wav');
-      fs.writeFileSync(inputFilePath, song);
+	  const songBuffer = Buffer.from(song, 'base64');
+      fs.writeFileSync(inputFilePath, songBuffer);
 
       // Output directory for Demucs
       const outputDir = path.join(process.cwd(), 'separated');

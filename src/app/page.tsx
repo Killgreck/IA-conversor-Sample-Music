@@ -71,7 +71,7 @@ export default function Home() {
       // Isolate vocals from the song
       setProgress('Isolating vocals from the song');
       setProgressValue(20);
-      const {vocalTrack, instrumentalTrack} = await isolateVocals(Buffer.from(songBase64, 'base64'));
+      const {vocalTrack, instrumentalTrack} = await isolateVocals(songBase64);
 
       // Train voice model
       setProgress('Training voice model');
@@ -184,3 +184,4 @@ export default function Home() {
     </div>
   );
 }
+
