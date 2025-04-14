@@ -1,4 +1,4 @@
-// 'use server';
+'use server';
 /**
  * @fileOverview Voice model training flow for voice conversion.
  *
@@ -7,13 +7,11 @@
  * - TrainVoiceModelOutput - The return type for the trainVoiceModel function.
  */
 
-'use server';
-
 import {ai} from '@/ai/ai-instance';
 import {z} from 'genkit';
 
 const TrainVoiceModelInputSchema = z.object({
-  voiceTrack: z.any().describe('The m4a voice track to train the voice model.'),
+  voiceTrack: z.instanceof(Buffer).describe('The m4a voice track to train the voice model.'),
 });
 export type TrainVoiceModelInput = z.infer<typeof TrainVoiceModelInputSchema>;
 
@@ -38,7 +36,7 @@ const trainVoiceModelFlow = ai.defineFlow<
   async input => {
     // TODO: Implement voice model training logic here.
     // This is a placeholder implementation.
-    console.log('Training voice model with input:', input);
+    console.log('Training voice model with input:', input.voiceTrack);
 
     // Return a dummy model ID for now.
     const modelId = 'dummy-model-id-' + Math.random().toString(36).substring(7);
@@ -48,3 +46,4 @@ const trainVoiceModelFlow = ai.defineFlow<
     };
   }
 );
+

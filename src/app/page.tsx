@@ -7,6 +7,10 @@ import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/compo
 import {Textarea} from '@/components/ui/textarea';
 import {toast} from '@/hooks/use-toast';
 import {useRouter} from 'next/navigation';
+import {isolateVocals} from '@/services/demucs';
+import {trainVoiceModel} from '@/ai/flows/voice-model-training';
+import {voiceConversion} from '@/ai/flows/voice-conversion';
+import {mergeAudio} from '@/services/audio-merger';
 
 export default function Home() {
   const [songFile, setSongFile] = useState<File | null>(null);
@@ -37,14 +41,28 @@ export default function Home() {
 
     setIsLoading(true);
     try {
-      // Implement the logic to send the files to the server
-      // and process the voice morphing.
-      // This is a placeholder for the actual implementation.
-      console.log('Song file:', songFile);
-      console.log('Voice file:', voiceFile);
+      // Convert files to ArrayBuffers
+      const songBuffer = await songFile.arrayBuffer();
+      const voiceBuffer = await voiceFile.arrayBuffer();
 
-      // Simulate processing
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Convert ArrayBuffers to Buffers
+      const song = Buffer.from(songBuffer);
+      const voiceTrack = Buffer.from(voiceBuffer);
+
+      // Isolate vocals from the song
+      const {vocalTrack, instrumentalTrack} = await isolateVocals(song);
+
+      // Train voice model
+      const {modelId} = await trainVoiceModel({voiceTrack: voiceTrack});
+
+      // Perform voice conversion
+      const {convertedVocalTrack} = await voiceConversion({
+        vocalTrack: vocalTrack,
+        voiceModelId: modelId,
+      });
+
+      // Merge the converted vocal track with the instrumental track
+      const mergedAudio = await mergeAudio(convertedVocalTrack, instrumentalTrack);
 
       toast({
         title: 'Success',
@@ -109,4 +127,3 @@ export default function Home() {
     </div>
   );
 }
-

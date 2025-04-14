@@ -36,6 +36,7 @@ const convertVoice = ai.defineTool({
 },
 async input => {
   // TODO: Implement this by calling the voice conversion API.
+  // This is a placeholder implementation.
   return Buffer.from('stubbed converted vocal track data');
 });
 
@@ -53,8 +54,9 @@ const voiceConversionFlow = ai.defineFlow<
   inputSchema: VoiceConversionInputSchema,
   outputSchema: VoiceConversionOutputSchema,
 }, async input => {
-  const {output} = await prompt(input);
+  const convertedVocalTrack = await convertVoice(input);
   return {
-    convertedVocalTrack: await convertVoice(input),
+    convertedVocalTrack: convertedVocalTrack,
   };
 });
+
