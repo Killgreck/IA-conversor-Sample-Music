@@ -26,6 +26,21 @@ async function fileToBase64(file: File): Promise<string> {
   });
 }
 
+async function fileToBuffer(file: File): Promise<Buffer> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = reader.result as ArrayBuffer;
+      resolve(Buffer.from(result));
+    };
+    reader.onerror = (error) => {
+      reject(error);
+    };
+    reader.readAsArrayBuffer(file);
+  });
+}
+
+
 export default function Home() {
   const [songFile, setSongFile] = useState<File | null>(null);
   const [voiceFile, setVoiceFile] = useState<File | null>(null);
@@ -65,13 +80,13 @@ export default function Home() {
       // Convert files to ArrayBuffers
       setProgress('Converting files to base64');
       setProgressValue(5);
-      const songBase64 = await fileToBase64(songFile);
+      const songBuffer = await fileToBuffer(songFile);
       const voiceTrackBase64 = await fileToBase64(voiceFile);
 
       // Isolate vocals from the song
       setProgress('Isolating vocals from the song');
       setProgressValue(20);
-      const {vocalTrack, instrumentalTrack} = await isolateVocals(songBase64);
+      const {vocalTrack, instrumentalTrack} = await isolateVocals(songBuffer);
 
       // Train voice model
       setProgress('Training voice model');
@@ -184,4 +199,3 @@ export default function Home() {
     </div>
   );
 }
-
