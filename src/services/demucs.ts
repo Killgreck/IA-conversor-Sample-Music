@@ -1,3 +1,4 @@
+'use server';
 /**
  * Represents the result of vocal isolation, containing the vocal track and the instrumental track.
  */
