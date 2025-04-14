@@ -23,15 +23,15 @@ export type VoiceConversionOutput = z.infer<typeof VoiceConversionOutputSchema>;
 
 export async function voiceConversion(input: VoiceConversionInput): Promise<VoiceConversionOutput> {
    // Convert the base64 encoded string back to a Buffer
-  const vocalTrackBuffer = Buffer.from(input.vocalTrack, 'base64');
-  return voiceConversionFlow({vocalTrack: vocalTrackBuffer, voiceModelId: input.voiceModelId});
+  // const vocalTrackBuffer = Buffer.from(input.vocalTrack, 'base64');
+  return voiceConversionFlow({vocalTrack: input.vocalTrack, voiceModelId: input.voiceModelId});
 }
 
 const convertVoice = ai.defineTool({
   name: 'convertVoice',
   description: 'Converts the provided vocal track using the specified voice model.',
   inputSchema: z.object({
-    vocalTrack: z.instanceof(Buffer).describe('The isolated vocal track as a binary audio file.'),
+    vocalTrack: z.string().describe('The isolated vocal track as a base64 encoded string.'),
     voiceModelId: z.string().describe('The ID of the trained voice model.'),
   }),
   outputSchema: z.instanceof(Buffer),
@@ -49,17 +49,18 @@ const prompt = ai.definePrompt({
 });
 
 const voiceConversionFlow = ai.defineFlow<
-  {vocalTrack: Buffer, voiceModelId: string},
+  {vocalTrack: string, voiceModelId: string},
   typeof VoiceConversionOutputSchema
 >({
   name: 'voiceConversionFlow',
   inputSchema: z.object({
-    vocalTrack: z.instanceof(Buffer).describe('The isolated vocal track as a binary audio file.'),
+    vocalTrack: z.string().describe('The isolated vocal track as a base64 encoded string.'),
     voiceModelId: z.string().describe('The ID of the trained voice model.'),
   }),
   outputSchema: VoiceConversionOutputSchema,
 }, async input => {
-  const convertedVocalTrack = await convertVoice(input);
+   const vocalTrackBuffer = Buffer.from(input.vocalTrack, 'base64');
+  const convertedVocalTrack = await convertVoice({vocalTrack: input.vocalTrack, voiceModelId: input.voiceModelId});
   return {
     convertedVocalTrack: convertedVocalTrack,
   };

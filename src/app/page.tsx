@@ -65,7 +65,7 @@ export default function Home() {
 
       // Perform voice conversion
       setProgress('Performing voice conversion');
-       const vocalTrackBase64ForConversion = vocalTrack.toString('base64');
+      const vocalTrackBase64ForConversion = vocalTrack.toString('base64');
       const {convertedVocalTrack} = await voiceConversion({
         vocalTrack: vocalTrackBase64ForConversion,
         voiceModelId: modelId,
