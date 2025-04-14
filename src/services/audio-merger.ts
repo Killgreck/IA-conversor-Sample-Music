@@ -13,14 +13,15 @@ export async function mergeAudio(vocalTrack: string, instrumentalTrack: Buffer):
       // Import 'child_process' only on the server side
       const { spawn } = require('child_process');
       const fs = require('fs');
+       const path = require('path');
 
       // Convert base64 vocal track to Buffer
       const vocalTrackBuffer = Buffer.from(vocalTrack, 'base64');
 
       // Temporary file paths
-      const vocalTrackPath = 'vocal.wav';
-      const instrumentalTrackPath = 'instrumental.wav';
-      const outputPath = 'merged.wav';
+      const vocalTrackPath = path.join(process.cwd(), 'vocal.wav');
+      const instrumentalTrackPath = path.join(process.cwd(), 'instrumental.wav');
+      const outputPath = path.join(process.cwd(), 'merged.wav');
 
       // Write buffers to temporary files
       fs.writeFileSync(vocalTrackPath, vocalTrackBuffer);

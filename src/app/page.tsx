@@ -1,17 +1,30 @@
 'use client';
 
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import {Button} from '@/components/ui/button';
 import {Input} from '@/components/ui/input';
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card';
-import {Textarea} from '@/components/ui/textarea';
 import {toast} from '@/hooks/use-toast';
 import {useRouter} from 'next/navigation';
 import {isolateVocals} from '@/services/demucs';
-import {trainVoiceModel} from '@/ai/flows/voice-model-training';
-import {voiceConversion} from '@/ai/flows/voice-conversion';
+import {trainVoiceModel, TrainVoiceModelInput, TrainVoiceModelOutput} from '@/ai/flows/voice-model-training';
+import {voiceConversion, VoiceConversionInput, VoiceConversionOutput} from '@/ai/flows/voice-conversion';
 import {mergeAudio} from '@/services/audio-merger';
 import {Progress} from "@/components/ui/progress";
+
+async function fileToBase64(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = reader.result as string;
+      resolve(result.split(',')[1]); // Remove the data:audio/xxx;base64, part
+    };
+    reader.onerror = (error) => {
+      reject(error);
+    };
+    reader.readAsDataURL(file);
+  });
+}
 
 export default function Home() {
   const [songFile, setSongFile] = useState<File | null>(null);
@@ -50,36 +63,33 @@ export default function Home() {
 
     try {
       // Convert files to ArrayBuffers
-      setProgress('Converting files to ArrayBuffers');
+      setProgress('Converting files to base64');
       setProgressValue(5);
-      const songBuffer = await songFile.arrayBuffer();
-      const voiceBuffer = await voiceFile.arrayBuffer();
-
-      // Convert ArrayBuffers to Buffers
-      setProgress('Converting ArrayBuffers to Buffers');
-      setProgressValue(10);
-      const song = Buffer.from(songBuffer);
-      const voiceTrack = Buffer.from(voiceBuffer);
+      const songBase64 = await fileToBase64(songFile);
+      const voiceTrackBase64 = await fileToBase64(voiceFile);
 
       // Isolate vocals from the song
       setProgress('Isolating vocals from the song');
       setProgressValue(20);
-      const {vocalTrack, instrumentalTrack} = await isolateVocals(song);
+      const {vocalTrack, instrumentalTrack} = await isolateVocals(Buffer.from(songBase64, 'base64'));
 
       // Train voice model
       setProgress('Training voice model');
       setProgressValue(40);
-      const voiceTrackBase64 = voiceTrack.toString('base64');
-      const {modelId} = await trainVoiceModel({voiceTrack: voiceTrackBase64});
+      const trainVoiceModelInput: TrainVoiceModelInput = {voiceTrack: voiceTrackBase64};
+      const trainVoiceModelResult: TrainVoiceModelOutput = await trainVoiceModel(trainVoiceModelInput);
+      const {modelId} = trainVoiceModelResult;
 
       // Perform voice conversion
       setProgress('Performing voice conversion');
       setProgressValue(60);
       const vocalTrackBase64ForConversion = vocalTrack.toString('base64');
-      const {convertedVocalTrack} = await voiceConversion({
+      const voiceConversionInput: VoiceConversionInput = {
         vocalTrack: vocalTrackBase64ForConversion,
         voiceModelId: modelId,
-      });
+      };
+      const voiceConversionResult: VoiceConversionOutput = await voiceConversion(voiceConversionInput);
+      const {convertedVocalTrack} = voiceConversionResult;
 
       // Merge the converted vocal track with the instrumental track
       setProgress('Merging the converted vocal track with the instrumental track');
@@ -110,6 +120,7 @@ export default function Home() {
       // Redirect to the new song.
       router.push('/new-song');
     } catch (error: any) {
+      console.error('Voice morphing error:', error);
       toast({
         title: 'Error',
         description: error.message || 'Failed to process voice morphing.',

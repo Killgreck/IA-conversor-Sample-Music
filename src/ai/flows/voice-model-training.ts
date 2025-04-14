@@ -22,15 +22,7 @@ const TrainVoiceModelOutputSchema = z.object({
 export type TrainVoiceModelOutput = z.infer<typeof TrainVoiceModelOutputSchema>;
 
 export async function trainVoiceModel(input: TrainVoiceModelInput): Promise<TrainVoiceModelOutput> {
-  try {
-    const modelId = await trainModel(input.voiceTrack);
-    return {
-      modelId: modelId,
-    };
-  } catch (error: any) {
-    console.error('Error during voice model training:', error);
-    throw new Error(error.message || 'Voice model training failed');
-  }
+  return trainVoiceModelFlow(input);
 }
 
 const trainVoiceModelFlow = ai.defineFlow<
@@ -45,16 +37,10 @@ const trainVoiceModelFlow = ai.defineFlow<
     outputSchema: TrainVoiceModelOutputSchema,
   },
   async input => {
-    // TODO: Implement voice model training logic here.
-    // This is a placeholder implementation.
-    const voiceTrackBuffer = Buffer.from(input.voiceTrack, 'base64');
-    console.log('Training voice model with input:', voiceTrackBuffer);
-
-    // Return a dummy model ID for now.
-    const modelId = 'dummy-model-id-' + Math.random().toString(36).substring(7);
-
+    const modelId = await trainModel(input.voiceTrack);
     return {
       modelId: modelId,
     };
   }
 );
+

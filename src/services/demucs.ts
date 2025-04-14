@@ -29,11 +29,11 @@ export async function isolateVocals(song: Buffer): Promise<VocalIsolationResult>
       const fs = require('fs');
 
       // Create a temporary input file
-      const inputFilePath = 'input.wav';
+      const inputFilePath = path.join(process.cwd(), 'input.wav');
       fs.writeFileSync(inputFilePath, song);
 
       // Output directory for Demucs
-      const outputDir = 'separated';
+      const outputDir = path.join(process.cwd(), 'separated');
       const demucsCommand = 'demucs';
       const demucsArgs = [inputFilePath, '-o', outputDir];
 
