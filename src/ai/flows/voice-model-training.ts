@@ -9,6 +9,7 @@
 
 import {ai} from '@/ai/ai-instance';
 import {z} from 'genkit';
+import {trainModel} from '@/services/voice-model-trainer';
 
 const TrainVoiceModelInputSchema = z.object({
   voiceTrack: z.string().describe('The m4a voice track to train the voice model, as a base64 encoded string.'),
@@ -21,7 +22,15 @@ const TrainVoiceModelOutputSchema = z.object({
 export type TrainVoiceModelOutput = z.infer<typeof TrainVoiceModelOutputSchema>;
 
 export async function trainVoiceModel(input: TrainVoiceModelInput): Promise<TrainVoiceModelOutput> {
-  return trainVoiceModelFlow(input);
+  try {
+    const modelId = await trainModel(input.voiceTrack);
+    return {
+      modelId: modelId,
+    };
+  } catch (error: any) {
+    console.error('Error during voice model training:', error);
+    throw new Error(error.message || 'Voice model training failed');
+  }
 }
 
 const trainVoiceModelFlow = ai.defineFlow<

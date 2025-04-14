@@ -9,6 +9,7 @@
 
 import {ai} from '@/ai/ai-instance';
 import {z} from 'genkit';
+import {convertVoice} from '@/services/voice-conversion';
 
 const VoiceConversionInputSchema = z.object({
   vocalTrack: z.string().describe('The isolated vocal track as a base64 encoded string.'),
@@ -22,31 +23,16 @@ const VoiceConversionOutputSchema = z.object({
 export type VoiceConversionOutput = z.infer<typeof VoiceConversionOutputSchema>;
 
 export async function voiceConversion(input: VoiceConversionInput): Promise<VoiceConversionOutput> {
-   // Convert the base64 encoded string back to a Buffer
-  // const vocalTrackBuffer = Buffer.from(input.vocalTrack, 'base64');
-  return voiceConversionFlow({vocalTrack: input.vocalTrack, voiceModelId: input.voiceModelId});
+  try {
+    const convertedVocalTrack = await convertVoice(input.vocalTrack, input.voiceModelId);
+    return {
+      convertedVocalTrack: convertedVocalTrack.toString('base64'),
+    };
+  } catch (error: any) {
+    console.error('Error during voice conversion:', error);
+    throw new Error(error.message || 'Voice conversion failed');
+  }
 }
-
-const convertVoice = ai.defineTool({
-  name: 'convertVoice',
-  description: 'Converts the provided vocal track using the specified voice model.',
-  inputSchema: z.object({
-    vocalTrack: z.string().describe('The isolated vocal track as a base64 encoded string.'),
-    voiceModelId: z.string().describe('The ID of the trained voice model.'),
-  }),
-  outputSchema: z.instanceof(Buffer),
-},
-async input => {
-  // TODO: Implement this by calling the voice conversion API.
-  // This is a placeholder implementation.
-  return Buffer.from('stubbed converted vocal track data');
-});
-
-const prompt = ai.definePrompt({
-  name: 'voiceConversionPrompt',
-  tools: [convertVoice],
-  prompt: `Use the convertVoice tool to convert the vocal track using the voice model. Then respond that the voice has been converted.`,  
-});
 
 const voiceConversionFlow = ai.defineFlow<
   {vocalTrack: string, voiceModelId: string},
@@ -59,8 +45,8 @@ const voiceConversionFlow = ai.defineFlow<
   }),
   outputSchema: VoiceConversionOutputSchema,
 }, async input => {
-   const vocalTrackBuffer = Buffer.from(input.vocalTrack, 'base64');
-  const convertedVocalTrackBuffer = await convertVoice({vocalTrack: input.vocalTrack, voiceModelId: input.voiceModelId});
+  const vocalTrackBuffer = Buffer.from(input.vocalTrack, 'base64');
+  const convertedVocalTrackBuffer = await convertVoice(input.vocalTrack, input.voiceModelId);
   const convertedVocalTrack = convertedVocalTrackBuffer.toString('base64');
   return {
     convertedVocalTrack: convertedVocalTrack,

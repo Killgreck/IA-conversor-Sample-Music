@@ -11,6 +11,7 @@ import {isolateVocals} from '@/services/demucs';
 import {trainVoiceModel} from '@/ai/flows/voice-model-training';
 import {voiceConversion} from '@/ai/flows/voice-conversion';
 import {mergeAudio} from '@/services/audio-merger';
+import {Progress} from "@/components/ui/progress";
 
 export default function Home() {
   const [songFile, setSongFile] = useState<File | null>(null);
@@ -20,6 +21,7 @@ export default function Home() {
 
   // Define progress state
   const [progress, setProgress] = useState<string>('Idle');
+  const [progressValue, setProgressValue] = useState<number>(0);
 
   const handleSongUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
@@ -43,28 +45,36 @@ export default function Home() {
     }
 
     setIsLoading(true);
+    setProgress('Starting...');
+    setProgressValue(0);
+
     try {
       // Convert files to ArrayBuffers
       setProgress('Converting files to ArrayBuffers');
+      setProgressValue(5);
       const songBuffer = await songFile.arrayBuffer();
       const voiceBuffer = await voiceFile.arrayBuffer();
 
       // Convert ArrayBuffers to Buffers
       setProgress('Converting ArrayBuffers to Buffers');
+      setProgressValue(10);
       const song = Buffer.from(songBuffer);
       const voiceTrack = Buffer.from(voiceBuffer);
 
       // Isolate vocals from the song
       setProgress('Isolating vocals from the song');
+      setProgressValue(20);
       const {vocalTrack, instrumentalTrack} = await isolateVocals(song);
 
       // Train voice model
       setProgress('Training voice model');
+      setProgressValue(40);
       const voiceTrackBase64 = voiceTrack.toString('base64');
       const {modelId} = await trainVoiceModel({voiceTrack: voiceTrackBase64});
 
       // Perform voice conversion
       setProgress('Performing voice conversion');
+      setProgressValue(60);
       const vocalTrackBase64ForConversion = vocalTrack.toString('base64');
       const {convertedVocalTrack} = await voiceConversion({
         vocalTrack: vocalTrackBase64ForConversion,
@@ -73,14 +83,17 @@ export default function Home() {
 
       // Merge the converted vocal track with the instrumental track
       setProgress('Merging the converted vocal track with the instrumental track');
+      setProgressValue(80);
       const mergedAudio = await mergeAudio(convertedVocalTrack, instrumentalTrack);
 
       // Convert the merged audio (Buffer) to a Blob
       setProgress('Converting the merged audio (Buffer) to a Blob');
+      setProgressValue(90);
       const blob = new Blob([mergedAudio], {type: 'audio/mpeg'});
 
       // Create a URL for the Blob
       setProgress('Creating a URL for the Blob');
+      setProgressValue(95);
       const newSongUrl = URL.createObjectURL(blob);
 
       // Log the URL to the console for debugging
@@ -104,6 +117,7 @@ export default function Home() {
     } finally {
       setIsLoading(false);
       setProgress('Idle'); // Reset progress
+      setProgressValue(0);
     }
   };
 
@@ -149,7 +163,10 @@ export default function Home() {
             {isLoading ? 'Processing... ' + progress : 'Morph Voice'}
           </Button>
           {progress !== 'Idle' && (
-            <p>Status: {progress}</p>
+              <>
+                <p>Status: {progress}</p>
+                <Progress value={progressValue} />
+              </>
           )}
         </CardContent>
       </Card>
