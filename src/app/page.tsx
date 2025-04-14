@@ -18,6 +18,9 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
+  // Define progress state
+  const [progress, setProgress] = useState<string>('Idle');
+
   const handleSongUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
       setSongFile(event.target.files[0]);
@@ -42,33 +45,44 @@ export default function Home() {
     setIsLoading(true);
     try {
       // Convert files to ArrayBuffers
+      setProgress('Converting files to ArrayBuffers');
       const songBuffer = await songFile.arrayBuffer();
       const voiceBuffer = await voiceFile.arrayBuffer();
 
       // Convert ArrayBuffers to Buffers
+      setProgress('Converting ArrayBuffers to Buffers');
       const song = Buffer.from(songBuffer);
       const voiceTrack = Buffer.from(voiceBuffer);
 
       // Isolate vocals from the song
+      setProgress('Isolating vocals from the song');
       const {vocalTrack, instrumentalTrack} = await isolateVocals(song);
 
       // Train voice model
+      setProgress('Training voice model');
       const {modelId} = await trainVoiceModel({voiceTrack: voiceTrack});
 
       // Perform voice conversion
+      setProgress('Performing voice conversion');
       const {convertedVocalTrack} = await voiceConversion({
         vocalTrack: vocalTrack,
         voiceModelId: modelId,
       });
 
       // Merge the converted vocal track with the instrumental track
+      setProgress('Merging the converted vocal track with the instrumental track');
       const mergedAudio = await mergeAudio(convertedVocalTrack, instrumentalTrack);
 
       // Convert the merged audio (Buffer) to a Blob
+      setProgress('Converting the merged audio (Buffer) to a Blob');
       const blob = new Blob([mergedAudio], {type: 'audio/mpeg'});
 
       // Create a URL for the Blob
+      setProgress('Creating a URL for the Blob');
       const newSongUrl = URL.createObjectURL(blob);
+
+      // Log the URL to the console for debugging
+      console.log('New Song URL:', newSongUrl);
 
       // Store the URL in local storage
       localStorage.setItem('newSongUrl', newSongUrl);
@@ -87,6 +101,7 @@ export default function Home() {
       });
     } finally {
       setIsLoading(false);
+      setProgress('Idle'); // Reset progress
     }
   };
 
@@ -129,8 +144,11 @@ export default function Home() {
             onClick={handleVoiceMorph}
             disabled={isLoading}
           >
-            {isLoading ? 'Processing...' : 'Morph Voice'}
+            {isLoading ? 'Processing... ' + progress : 'Morph Voice'}
           </Button>
+          {progress !== 'Idle' && (
+            <p>Status: {progress}</p>
+          )}
         </CardContent>
       </Card>
     </div>

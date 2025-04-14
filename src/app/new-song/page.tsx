@@ -10,6 +10,7 @@ export default function NewSong() {
     const url = localStorage.getItem('newSongUrl');
     if (url) {
       setAudioUrl(url);
+      console.log('Audio URL from local storage:', url); // Log the URL
     }
   }, []);
 
