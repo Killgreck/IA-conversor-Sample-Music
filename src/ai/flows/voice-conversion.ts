@@ -17,7 +17,7 @@ const VoiceConversionInputSchema = z.object({
 export type VoiceConversionInput = z.infer<typeof VoiceConversionInputSchema>;
 
 const VoiceConversionOutputSchema = z.object({
-  convertedVocalTrack: z.instanceof(Buffer).describe('The converted vocal track as a binary audio file.'),
+  convertedVocalTrack: z.string().describe('The converted vocal track as a base64 encoded string.'),
 });
 export type VoiceConversionOutput = z.infer<typeof VoiceConversionOutputSchema>;
 
@@ -60,7 +60,8 @@ const voiceConversionFlow = ai.defineFlow<
   outputSchema: VoiceConversionOutputSchema,
 }, async input => {
    const vocalTrackBuffer = Buffer.from(input.vocalTrack, 'base64');
-  const convertedVocalTrack = await convertVoice({vocalTrack: input.vocalTrack, voiceModelId: input.voiceModelId});
+  const convertedVocalTrackBuffer = await convertVoice({vocalTrack: input.vocalTrack, voiceModelId: input.voiceModelId});
+  const convertedVocalTrack = convertedVocalTrackBuffer.toString('base64');
   return {
     convertedVocalTrack: convertedVocalTrack,
   };

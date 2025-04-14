@@ -21,9 +21,7 @@ const TrainVoiceModelOutputSchema = z.object({
 export type TrainVoiceModelOutput = z.infer<typeof TrainVoiceModelOutputSchema>;
 
 export async function trainVoiceModel(input: TrainVoiceModelInput): Promise<TrainVoiceModelOutput> {
-  // Convert the base64 encoded string back to a Buffer
-  // const voiceTrackBuffer = Buffer.from(input.voiceTrack, 'base64');
-  return trainVoiceModelFlow({voiceTrack: input.voiceTrack});
+  return trainVoiceModelFlow(input);
 }
 
 const trainVoiceModelFlow = ai.defineFlow<
