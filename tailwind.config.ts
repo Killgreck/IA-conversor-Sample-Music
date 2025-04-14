@@ -59,7 +59,10 @@ export default {
   				'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
   				border: 'hsl(var(--sidebar-border))',
   				ring: 'hsl(var(--sidebar-ring))'
-  			}
+  			},
+        'deep-purple': 'hsl(var(--primary))', // Deep purple (#673AB7)
+        'light-gray': 'hsl(var(--secondary))', // Light gray (#F5F5F5)
+        'teal': 'hsl(var(--accent))', // Teal (#009688)
   		},
   		borderRadius: {
   			lg: 'var(--radius)',
@@ -92,3 +95,4 @@ export default {
   },
   plugins: [require("tailwindcss-animate")],
 } satisfies Config;
+

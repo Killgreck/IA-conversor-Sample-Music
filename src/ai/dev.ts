@@ -1,1 +1,2 @@
-// Flows will be imported for their side effects in this file.
+import '@/ai/flows/voice-model-training.ts';
+import '@/ai/flows/voice-conversion.ts';
