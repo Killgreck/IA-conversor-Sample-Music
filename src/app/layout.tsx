@@ -58,7 +58,11 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  await installDemucs();
+  try {
+      await installDemucs();
+  } catch (e: any) {
+      console.error('Failed to install Demucs:', e);
+  }
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
@@ -67,4 +71,3 @@ export default async function RootLayout({
     </html>
   );
 }
-
