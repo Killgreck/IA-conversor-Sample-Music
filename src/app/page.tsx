@@ -11,6 +11,7 @@ import {trainVoiceModel, TrainVoiceModelInput, TrainVoiceModelOutput} from '@/ai
 import {voiceConversion, VoiceConversionInput, VoiceConversionOutput} from '@/ai/flows/voice-conversion';
 import {mergeAudio} from '@/services/audio-merger';
 import {Progress} from "@/components/ui/progress";
+import {installDemucsAction} from '@/services/install-demucs';
 
 async function fileToBase64(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -35,6 +36,32 @@ export default function Home() {
   // Define progress state
   const [progress, setProgress] = useState<string>('Idle');
   const [progressValue, setProgressValue] = useState<number>(0);
+
+  useEffect(() => {
+    const install = async () => {
+      try {
+        // Install Demucs if not already installed
+        if (process.env.NODE_ENV !== 'test' && process.env.NEXT_PUBLIC_VERCEL_ENV !== 'production') {
+          setProgress('Checking Demucs installation...');
+          setProgressValue(5);
+          await installDemucsAction({
+            onProgress: (message: string, value: number) => {
+              setProgress(message);
+              setProgressValue(value);
+            },
+          });
+        }
+      } catch (e: any) {
+        console.error('Failed to install Demucs:', e);
+        toast({
+          title: 'Error',
+          description: 'Failed to install Demucs: ' + (e.message || 'Unknown error'),
+        });
+      }
+    };
+    install();
+  }, []);
+
 
   const handleSongUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
