@@ -44,12 +44,10 @@ export default function Home() {
         if (process.env.NODE_ENV !== 'test' && process.env.NEXT_PUBLIC_VERCEL_ENV !== 'production') {
           setProgress('Checking Demucs installation...');
           setProgressValue(5);
-          await installDemucsAction({
-            onProgress: (message: string, value: number) => {
-              setProgress(message);
-              setProgressValue(value);
-            },
-          });
+          // Removed onProgress callback
+          await installDemucsAction();
+          setProgress('Demucs installation complete.');
+          setProgressValue(10);
         }
       } catch (e: any) {
         console.error('Failed to install Demucs:', e);
@@ -210,3 +208,4 @@ export default function Home() {
     </div>
   );
 }
+
