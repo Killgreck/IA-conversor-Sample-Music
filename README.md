@@ -1,7 +1,7 @@
 # Firebase Studio
 
 This is a NextJS starter in Firebase Studio.
-This project is a Next.js application integrated with Firebase, designed for [voice conversion using AI].  It utilizes a Python-based AI model for [voice conversion] and offers both a backend and frontend with distinct features.
+This project is a Next.js application integrated with Firebase, designed for voice conversion using AI. It utilizes a Python-based AI model for voice conversion (so-vits-svc) and offers both a backend and frontend with distinct features.
 
 ## Features
 
@@ -9,38 +9,51 @@ This project is a Next.js application integrated with Firebase, designed for [vo
 
 The backend handles the core logic of the application, including:
 
-*   **AI Model Integration:**  Interfaces with a Python-based AI model (likely `so-vits-svc`) for [e.g., voice conversion].
-*   **Audio Processing:**  Handles audio file uploads, processing, and manipulation using libraries like [ffmpeg, torchaudio].
-*   **Task Management:**  Manages the execution and status of AI processing tasks, potentially using queues or job systems.
-*   **Firebase Integration:**  Utilizes Firebase for [authentication, database, storage].
+*   **AI Model Integration:** Interfaces with a Python-based AI model (so-vits-svc) for voice conversion.
+*   **Audio Processing:** Handles audio file uploads, processing, and manipulation using libraries like demucs, ffmpeg, and pydub.
+*   **Task Management:** Manages the execution and status of AI processing tasks.
+*   **Firebase Integration:** Utilizes Firebase for authentication, database, and storage.
 *   **API Endpoints:** Provides API endpoints for the frontend to interact with the backend functionality.
 
 ### Frontend
 
 The frontend provides a user interface for interacting with the application's features:
 
-*   **User Authentication:**  Allows users to create accounts and log in using Firebase authentication.
+*   **User Authentication:** Allows users to create accounts and log in using Firebase authentication.
 *   **File Upload:** Enables users to upload audio files for processing.
-*   **Task Submission:**  Allows users to submit processing tasks to the backend, selecting options and parameters as needed.
-*   **Task Monitoring:**  Provides a way for users to monitor the progress and status of their submitted tasks.
-*   **Result Download:**  Allows users to download the processed audio files once the tasks are completed.
-*   **User Interface:** Presents a clean and intuitive user interface, potentially using a component library like [e.g., Material UI, Chakra UI].
+*   **Task Submission:** Allows users to submit processing tasks to the backend, selecting options and parameters as needed.
+*   **Task Monitoring:** Provides a way for users to monitor the progress and status of their submitted tasks.
+*   **Result Download:** Allows users to download the processed audio files once the tasks are completed.
+*   **User Interface:** Presents a clean and intuitive user interface using Radix UI components.
 
 ## Running the Application in Visual Studio Code for Testing
 
 Follow these step-by-step instructions to run the application locally in Visual Studio Code for development and testing:
 
 1.  **Prerequisites:** Ensure you have the following software installed:
-    *   **Node.js:**  Download and install the latest LTS version from [https://nodejs.org/](https://nodejs.org/).
-    *   **npm (or yarn):**  npm usually comes bundled with Node.js.  If not, or if you prefer yarn, install it separately.
-    *   **Python:** You will need Python 3.7 or higher to run the AI model components.  Install it from [https://www.python.org/](https://www.python.org/).  Ensure that `python` and `pip` are added to your system's PATH environment variable.
-    *   **Visual Studio Code:**  Download and install it from [https://code.visualstudio.com/](https://code.visualstudio.com/).
-    *   **Git:**  Install Git from [https://git-scm.com/](https://git-scm.com/).
-2.  **Clone the Repository:**  Open Visual Studio Code, and use the "Clone Repository" option (Ctrl+Shift+P or Cmd+Shift+P, then type "Git: Clone") to clone the project's Git repository to your local machine.
-3.  **Install Dependencies:**  Open the cloned project in VS Code. Open a new terminal (Ctrl+\` or Cmd+\`). Navigate to the project directory and run `npm install` to install the required Node.js packages. Then, you will need to install the Python dependencies for your AI model. This typically involves navigating to the directory containing the AI model code and using `pip install -r requirements.txt` (if a `requirements.txt` file exists) or installing the dependencies individually based on the model's documentation (most likely `torch`, `torchaudio`, and potentially others).
-4.  **Install Python Dependencies:** Before running the application, you need to install the required Python packages for the AI model. Open a new terminal in VS Code (or use the existing one) and navigate to the project directory. Then, run the following command to install the Python dependencies listed in the `requirements.txt` file:  `pip install -r requirements.txt`. This command uses `pip`, the Python package installer, to install all necessary libraries (including `torch`, `torchaudio`, and `demucs`).  Ensure that you have Python and `pip` installed and that they are accessible from your terminal.
-5.  **Install Node.js Dependencies:** After installing the Python dependencies, you need to install the Node.js packages required by the Next.js application. In the same terminal (or a new one), navigate to the project directory (if you're not already there) and run `npm install`. This command uses `npm` (Node Package Manager) to install all the necessary JavaScript libraries for the frontend and backend of the Next.js application. It's essential to run this command *after* installing the Python dependencies.
-6.  **Configure Firebase:**  You will need to set up a Firebase project and configure the necessary credentials (e.g., `firebaseConfig` object) within your application, typically in a file like `firebase.ts` or similar. Refer to the Firebase documentation for instructions on creating a project and obtaining the configuration details.
-5.  **Run the Development Server:**  In the VS Code terminal, run `npm run dev`. This will start the Next.js development server, usually accessible at `http://localhost:3000` in your web browser.  The server will watch for file changes and automatically recompile the code as you make modifications.  Keep this terminal open while you're testing.
-7.  **Test the Application:** Open your web browser and navigate to `http://localhost:3000`. You should now be able to interact with the application and test its features.  Since the AI components may run as separate processes, ensure they are also running or will be started by the Next.js server (check the `src/services/voice-conversion.ts` file and any related code that uses `child_process.spawn`).  If the AI components have separate run commands, you may need to run them in separate terminals. You may see errors in the browser console if the python dependencies have not been resolved correctly.
-8.  **Debugging:**  VS Code offers excellent debugging capabilities.  You can set breakpoints in your JavaScript/TypeScript code, and also potentially debug the Python components if you configure a Python debugger in VS Code.  Refer to the VS Code documentation for debugging instructions.  To debug the Next.js application, you can use the "Run and Debug" view (Ctrl+Shift+D or Cmd+Shift+D) and select a configuration (if one exists, or create a new one for Node.js debugging).
+    *   **Node.js:** Download and install the latest LTS version from [https://nodejs.org/](https://nodejs.org/).
+    *   **npm (or yarn):** npm usually comes bundled with Node.js. If not, or if you prefer yarn, install it separately.
+    *   **Python:** You will need Python 3.7 or higher to run the AI model components. Install it from [https://www.python.org/](https://www.python.org/). Ensure that `python` and `pip` are added to your system's PATH environment variable.
+    *   **Visual Studio Code:** Download and install it from [https://code.visualstudio.com/](https://code.visualstudio.com/).
+    *   **Git:** Install Git from [https://git-scm.com/](https://git-scm.com/).
+    *   **FFmpeg:** Install FFmpeg from [https://ffmpeg.org/](https://ffmpeg.org/) for audio processing.
+2.  **Clone the Repository:** Open Visual Studio Code, and use the "Clone Repository" option (Ctrl+Shift+P or Cmd+Shift+P, then type "Git: Clone") to clone the project's Git repository to your local machine.
+3.  **Install Dependencies:**
+    *   **Python Dependencies:** In the terminal, run `pip install -r requirements.txt` to install the required Python packages.
+    *   **Node.js Dependencies:** Run `npm install` to install the required Node.js packages.
+    *   **so-vits-svc:** Clone the so-vits-svc repository by running `git clone https://github.com/svc-develop-team/so-vits-svc` in a suitable location. Follow the installation instructions in the so-vits-svc repository to set it up.
+4.  **Configure Firebase:** You will need to set up a Firebase project and configure the necessary credentials (e.g., `firebaseConfig` object) within your application, typically in a file like `firebase.ts` or similar. Refer to the Firebase documentation for instructions on creating a project and obtaining the configuration details.
+5.  **Run the Development Server:** In the VS Code terminal, run `npm run dev`. This will start the Next.js development server, usually accessible at `http://localhost:9002` in your web browser (as specified in package.json). The server will watch for file changes and automatically recompile the code as you make modifications. Keep this terminal open while you're testing.
+6.  **Test the Application:** Open your web browser and navigate to `http://localhost:9002`. You should now be able to interact with the application and test its features.
+7.  **Debugging:** VS Code offers excellent debugging capabilities. You can set breakpoints in your JavaScript/TypeScript code, and also potentially debug the Python components if you configure a Python debugger in VS Code. Refer to the VS Code documentation for debugging instructions.
+
+## Project Structure
+
+The project has been refactored to use Python scripts for AI-related tasks, with TypeScript code calling these scripts as needed:
+
+- `scripts/separate_vocals.py`: Python script for separating vocals from a song using demucs.
+- `scripts/train_model.py`: Python script for training a voice conversion model using so-vits-svc.
+- `scripts/convert_voice.py`: Python script for converting vocals using a trained model.
+- `scripts/merge_audio.py`: Python script for merging converted vocals with instrumental tracks.
+
+The TypeScript services in `src/services/` call these Python scripts using child_process.spawn.
