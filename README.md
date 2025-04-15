@@ -1,7 +1,7 @@
 # Firebase Studio
 
 This is a NextJS starter in Firebase Studio.
-This project is a Next.js application integrated with Firebase, designed for [briefly describe the application's core function, e.g., voice conversion using AI].  It utilizes a Python-based AI model for [specific AI task] and offers both a backend and frontend with distinct features.
+This project is a Next.js application integrated with Firebase, designed for [voice conversion using AI].  It utilizes a Python-based AI model for [voice conversion] and offers both a backend and frontend with distinct features.
 
 ## Features
 
@@ -9,10 +9,10 @@ This project is a Next.js application integrated with Firebase, designed for [br
 
 The backend handles the core logic of the application, including:
 
-*   **AI Model Integration:**  Interfaces with a Python-based AI model (likely `so-vits-svc`) for [specific AI task, e.g., voice conversion].
-*   **Audio Processing:**  Handles audio file uploads, processing, and manipulation using libraries like [mention libraries like ffmpeg, torchaudio, if used].
+*   **AI Model Integration:**  Interfaces with a Python-based AI model (likely `so-vits-svc`) for [e.g., voice conversion].
+*   **Audio Processing:**  Handles audio file uploads, processing, and manipulation using libraries like [ffmpeg, torchaudio].
 *   **Task Management:**  Manages the execution and status of AI processing tasks, potentially using queues or job systems.
-*   **Firebase Integration:**  Utilizes Firebase for [mention specific Firebase services used, e.g., authentication, database, storage].
+*   **Firebase Integration:**  Utilizes Firebase for [authentication, database, storage].
 *   **API Endpoints:** Provides API endpoints for the frontend to interact with the backend functionality.
 
 ### Frontend
@@ -24,7 +24,7 @@ The frontend provides a user interface for interacting with the application's fe
 *   **Task Submission:**  Allows users to submit processing tasks to the backend, selecting options and parameters as needed.
 *   **Task Monitoring:**  Provides a way for users to monitor the progress and status of their submitted tasks.
 *   **Result Download:**  Allows users to download the processed audio files once the tasks are completed.
-*   **User Interface:** Presents a clean and intuitive user interface, potentially using a component library like [mention used component library if applicable, e.g., Material UI, Chakra UI].
+*   **User Interface:** Presents a clean and intuitive user interface, potentially using a component library like [e.g., Material UI, Chakra UI].
 
 ## Running the Application in Visual Studio Code for Testing
 
