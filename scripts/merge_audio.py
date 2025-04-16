@@ -21,10 +21,30 @@ def merge_audio(vocal_file, instrumental_file, output_file, vocal_volume=-2, ins
     """
     # Load the audio files
     print(f"Loading vocal track from {vocal_file}...")
-    voz = AudioSegment.from_wav(vocal_file)
+    try:
+        if vocal_file.lower().endswith('.mp3'):
+            voz = AudioSegment.from_mp3(vocal_file)
+        elif vocal_file.lower().endswith('.wav'):
+            voz = AudioSegment.from_wav(vocal_file)
+        else:
+            voz = AudioSegment.from_file(vocal_file)
+    except Exception as e:
+        print(f"Error loading vocal file: {str(e)}")
+        print(f"Trying alternative loading method...")
+        voz = AudioSegment.from_file(vocal_file)
     
     print(f"Loading instrumental track from {instrumental_file}...")
-    musica = AudioSegment.from_wav(instrumental_file)
+    try:
+        if instrumental_file.lower().endswith('.mp3'):
+            musica = AudioSegment.from_mp3(instrumental_file)
+        elif instrumental_file.lower().endswith('.wav'):
+            musica = AudioSegment.from_wav(instrumental_file)
+        else:
+            musica = AudioSegment.from_file(instrumental_file)
+    except Exception as e:
+        print(f"Error loading instrumental file: {str(e)}")
+        print(f"Trying alternative loading method...")
+        musica = AudioSegment.from_file(instrumental_file)
     
     # Adjust volumes
     voz = voz + vocal_volume  # Reduce vocal volume by 2dB
@@ -58,7 +78,8 @@ def main():
     try:
         output_file = merge_audio(args.vocal_file, args.instrumental_file, args.output_file, args.vocal_volume, args.instrumental_volume)
         # Print the output file path to stdout for the TypeScript code to capture
-        print(f"OUTPUT_FILE:{output_file}")
+        # Use double quotes to ensure proper parsing in TypeScript
+        print(f'OUTPUT_FILE="{output_file.replace("\\", "/")}"')
         return 0
     except Exception as e:
         print(f"Error: {str(e)}", file=sys.stderr)

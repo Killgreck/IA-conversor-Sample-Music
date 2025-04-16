@@ -20,6 +20,9 @@ def train_voice_model(voice_file, model_name, so_vits_svc_dir):
     """
     # Ensure so-vits-svc directory exists
     if not os.path.exists(so_vits_svc_dir):
+        print(f"ERROR: so-vits-svc directory not found at {so_vits_svc_dir}")
+        print(f"Current working directory: {os.getcwd()}")
+        print(f"Directory contents: {os.listdir('.')}")
         raise FileNotFoundError(f"so-vits-svc directory not found at {so_vits_svc_dir}")
     
     # Create dataset_raw directory if it doesn't exist
@@ -84,7 +87,8 @@ def main():
     try:
         model_path = train_voice_model(args.voice_file, args.model_name, args.so_vits_svc_dir)
         # Print the model path to stdout for the TypeScript code to capture
-        print(f"MODEL_PATH:{model_path}")
+        # Use double quotes to ensure proper parsing in TypeScript
+        print(f'MODEL_PATH="{model_path.replace("\\", "/")}"')
         return 0
     except Exception as e:
         print(f"Error: {str(e)}", file=sys.stderr)

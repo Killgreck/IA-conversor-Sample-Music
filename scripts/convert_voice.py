@@ -21,14 +21,23 @@ def convert_voice(vocal_file, model_path, config_path, output_file, so_vits_svc_
     """
     # Ensure so-vits-svc directory exists
     if not os.path.exists(so_vits_svc_dir):
+        print(f"ERROR: so-vits-svc directory not found at {so_vits_svc_dir}")
+        print(f"Current working directory: {os.getcwd()}")
+        print(f"Directory contents: {os.listdir('.')}")
         raise FileNotFoundError(f"so-vits-svc directory not found at {so_vits_svc_dir}")
     
     # Ensure model file exists
     if not os.path.exists(model_path):
+        print(f"ERROR: Model file not found at {model_path}")
+        print(f"Current working directory: {os.getcwd()}")
+        print(f"Directory contents of parent folder: {os.listdir(os.path.dirname(model_path) if os.path.dirname(model_path) else '.')}")
         raise FileNotFoundError(f"Model file not found at {model_path}")
     
     # Ensure config file exists
     if not os.path.exists(config_path):
+        print(f"ERROR: Config file not found at {config_path}")
+        print(f"Current working directory: {os.getcwd()}")
+        print(f"Directory contents of parent folder: {os.listdir(os.path.dirname(config_path) if os.path.dirname(config_path) else '.')}")
         raise FileNotFoundError(f"Config file not found at {config_path}")
     
     # Change to so-vits-svc directory
