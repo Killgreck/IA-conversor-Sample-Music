@@ -50,7 +50,9 @@ export async function isolateVocals(song: string): Promise<VocalIsolationResult>
       let errorOutput = '';
 
       pythonProcess.stdout.on('data', (data: Buffer) => {
-        stdoutData += data.toString();
+        const dataStr = data.toString();
+        console.log('Python output:', dataStr);
+        stdoutData += dataStr;
       });
 
       pythonProcess.stderr.on('data', (data: Buffer) => {
@@ -65,14 +67,18 @@ export async function isolateVocals(song: string): Promise<VocalIsolationResult>
           
           const lines = stdoutData.split('\n');
           for (const line of lines) {
-            if (line.startsWith('VOCALS_PATH:')) {
-              vocalsPath = line.substring('VOCALS_PATH:'.length);
-            } else if (line.startsWith('INSTRUMENTAL_PATH:')) {
-              instrumentalPath = line.substring('INSTRUMENTAL_PATH:'.length);
+            if (line.startsWith('VOCALS_PATH=')) {
+              vocalsPath = line.substring('VOCALS_PATH='.length).replace(/"/g, '');
+            } else if (line.startsWith('INSTRUMENTAL_PATH=')) {
+              instrumentalPath = line.substring('INSTRUMENTAL_PATH='.length).replace(/"/g, '');
             }
           }
+          
+          console.log('Found vocals path:', vocalsPath);
+          console.log('Found instrumental path:', instrumentalPath);
 
           if (!vocalsPath || !instrumentalPath) {
+            console.error('Failed to parse paths from output:', stdoutData);
             return reject(new Error('Failed to get paths to vocal or instrumental tracks from Python script output'));
           }
 
